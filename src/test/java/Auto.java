@@ -1,73 +1,105 @@
 package com.example.tests;
 
-import java.util.regex.Pattern;
-import java.util.concurrent.TimeUnit;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.*;
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.Select;
+import org.junit.runners.Parameterized;
+import org.junit.runner.RunWith;
+import java.util.Arrays;
+import java.util.Collection;
+
+
+@RunWith(Parameterized.class)
 
 public class Auto {
-  private WebDriver driver;
-  private String baseUrl;
-  private boolean acceptNextAlert = true;
+   private static WebDriver driver;
+  static com.example.tests.Calc calc = new com.example.tests.Calc(driver);
 
+  @Parameterized.Parameter
+  public String exp;
+  @Parameterized.Parameter(1)
+  public String expected;
 
-  @Before
-  public void setUp() throws Exception {
-    WebDriverManager.chromedriver().setup();
-    driver = new ChromeDriver();
-    baseUrl = "https://www.google.com/";
+  @BeforeClass
+  public static void openPage() {
+    calc.setUp();
   }
 
-  @Test
-  public void testAuto() throws Exception {
-    driver.get(baseUrl);
-    driver.findElement(By.id("lst-ib")).sendKeys("selenium webdriver");
-    driver.findElement(By.id("lst-ib")).sendKeys(Keys.ENTER);
-  }
+  @org.junit.Test
+  public void displaytest() throws Exception {
 
-  @After
-  public void tearDown() throws Exception {
-    //driver.quit();
+      assertEquals(expected, calc.display(exp));
 
   }
+  @Parameterized.Parameters (name="Test: {0}={1}")
+  public static Collection<Object[]> data() {
+     return Arrays.asList(new Object[][] {
+            { "1", "1" },
+            { "2", "2" },
+            { "3", "3" },
+            { "4", "4" },
+            { "5", "5" },
+            { "6", "6" },
+            { "7", "7" },
+            { "8", "8" },
+            { "9", "9" },
+            { "0", "0" },
 
-  private boolean isElementPresent(By by) {
-    try {
-      driver.findElement(by);
-      return true;
-    } catch (NoSuchElementException e) {
-      return false;
+            { "1/0", "Infinity" },
+
+            { "0.999999999999999+1", "1.999999999999999" },
+            { "0.99999999999999999+1", "1.99999999999999999" },
+            { "0.999999999999999999+1", "1.999999999999999999" },
+
+            { "0.000000000000001+1", "1.000000000000001" },
+            { "0.0000000000000001+1", "1.0000000000000001" },
+            { "0.00000000000000001+1", "1.00000000000000001" },
+
+            { "+1", "1" },
+            { "1+", "1" },
+            { "1", "1" },
+            { "", "" },
+
+            { "qweyqtrye", "qweyqtrye" },
+            { "!@#$%^&", "!@#$%^&" },
+            { "Infinity*0", "0" },
+            { "        ", "" }
+    });
+  }
+  /* Object[][] data=new Object[22][2];
+    for (int i=0;i<10;i++)
+    {
+     data[i][0]= Integer.toString(i);
+data[i][1]= Integer.toString(i);
     }
-  }
+   data[10][0]="1/0";  data[10][1]="Infinity";
 
-  private boolean isAlertPresent() {
-    try {
-      driver.switchTo().alert();
-      return true;
-    } catch (NoAlertPresentException e) {
-      return false;
-    }
-  }
 
-  private String closeAlertAndGetItsText() {
-    try {
-      Alert alert = driver.switchTo().alert();
-      String alertText = alert.getText();
-      if (acceptNextAlert) {
-        alert.accept();
-      } else {
-        alert.dismiss();
-      }
-      return alertText;
-    } finally {
-      acceptNextAlert = true;
-    }
+    data[11][0]="0.999999999999999+1";  data[11][1]="1.999999999999999";
+    data[12][0]="0.99999999999999999+1";  data[12][1]="1.99999999999999999";
+    data[13][0]="0.999999999999999999+1";  data[13][1]="1.999999999999999999";
+
+    data[14][0]="0.000000000000001+1";  data[14][1]="1.000000000000001";
+    data[15][0]="0.0000000000000001+1";  data[15][1]="1.0000000000000001";
+    data[16][0]="0.00000000000000001+1";  data[16][1]="1.00000000000000001";
+
+    data[17][0]="+1";  data[17][1]="1";
+    data[18][0]="1+";  data[18][1]="1";
+    data[19][0]="1";  data[19][1]="1";
+    //data[20][0]="";  data[20][1]="";
+
+    data[20][0]="qweyqtrye";  data[20][1]="qweyqtrye";
+    data[21][0]="!@#$%^&";  data[21][1]="!@#$%^&";
+    //data[0][0]="         ";  data[0][1]="";
+
+    return Arrays.asList(data);
+  }
+*/
+
+  @AfterClass
+  public static void stop() throws Exception {
+   calc.quit();
+
   }
 }
